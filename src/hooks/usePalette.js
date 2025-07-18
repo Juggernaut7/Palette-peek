@@ -1,7 +1,7 @@
 // hooks/usePalette.js
 import { useState, useEffect } from 'react';
 import { getFromLocalStorage, saveToLocalStorage } from '../utils/localStorageUtils';
-import { generateRandomHexColor, hexToRgb, rgbToHsl } from '../utils/colorUtils';
+import { generateRandomHexColor, hexToRgb, rgbToHsl } from "../utils/colorUtils"
 
 const usePalette = (currentUser) => {
   const [currentPalette, setCurrentPalette] = useState([]);
