@@ -1,8 +1,6 @@
-// src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaSave, FaRandom, FaTrash, FaInfoCircle } from 'react-icons/fa';
-
+import { FaPlus, FaSave, FaRandom, FaInfoCircle } from 'react-icons/fa';
 import useAuth from '../hooks/useAuth';
 import usePalette from '../hooks/usePalette';
 import ColorBox from '../components/ColorBox';
@@ -24,13 +22,11 @@ const HomePage = () => {
   const [message, setMessage] = useState('');
   const [isMessageError, setIsMessageError] = useState(false);
 
-  // Generate initial palette on mount if empty
   useEffect(() => {
     if (currentPalette.length === 0) {
       generateRandomPalette();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array means this runs once on mount
+  }, [currentPalette, generateRandomPalette]);
 
   const handleAddColor = (e) => {
     e.preventDefault();
@@ -42,7 +38,7 @@ const HomePage = () => {
     }
     const validHex = hex.startsWith('#') ? hex : `#${hex}`;
     if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(validHex)) {
-      setMessage('Invalid hex code. Please use #RRGGBB or #RGB format.');
+      setMessage('Invalid hex code. Use #RRGGBB or #RGB format.');
       setIsMessageError(true);
       return;
     }
@@ -68,27 +64,35 @@ const HomePage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="container mx-auto p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-80px)] flex flex-col"
+      transition={{ duration: 0.5 }}
+      className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-[calc(100vh-140px)] flex flex-col bg-gradient-to-br from-navy-900 to-teal-900 text-white"
     >
       {/* Message Display */}
-      {message && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className={`text-center text-sm font-medium p-3 rounded-lg mb-6 ${isMessageError ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200' : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200'} shadow-md`}
-        >
-          {message}
-        </motion.p>
-      )}
+      <AnimatePresence>
+        {message && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className={`text-center text-sm font-medium p-4 rounded-xl mb-6 ${
+              isMessageError
+                ? 'bg-red-600/80 text-white'
+                : 'bg-teal-600/80 text-white'
+            } shadow-lg backdrop-blur-sm`}
+          >
+            {message}
+          </motion.p>
+        )}
+      </AnimatePresence>
 
       {/* Current Palette Section */}
-      <section className="flex-grow flex flex-col items-center justify-center mb-10">
-        <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+      <section className="flex-grow flex flex-col items-center mb-10">
+        <h2 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-teal-400 tracking-tight">
           Your Current Palette
         </h2>
         <motion.div
           layout
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 w-full max-w-6xl"
+          className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 sm:gap-4 w-full max-w-7xl"
         >
           <AnimatePresence>
             {currentPalette.map((color) => (
@@ -98,39 +102,41 @@ const HomePage = () => {
         </motion.div>
 
         {/* Actions for Current Palette */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8 w-full max-w-4xl px-2 sm:px-0"> {/* Added px-2 for small screens */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6 sm:mt-8 w-full max-w-4xl px-2">
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, boxShadow: '0 8px 20px rgba(45, 212, 191, 0.3)' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => generateRandomPalette()}
-            className="flex items-center px-6 py-3 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors duration-300 shadow-lg w-full sm:w-auto justify-center"
+            className="flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-teal-500 text-navy-900 font-semibold hover:bg-teal-400 transition-all duration-300 shadow-lg w-full sm:w-auto"
           >
             <FaRandom className="mr-2" /> Generate Random
           </motion.button>
 
-          <form onSubmit={handleAddColor} className="flex w-full sm:w-auto flex-grow">
+          <form onSubmit={handleAddColor} className="flex w-full sm:w-auto flex-grow max-w-md">
             <input
               type="text"
               value={newColorHex}
               onChange={(e) => setNewColorHex(e.target.value)}
               placeholder="Add #HEX or HEX (e.g., #FF00FF)"
-              className="flex-grow px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-l-xl focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-colors duration-300"
+              className="flex-grow px-4 py-2 sm:py-3 border border-teal-600 rounded-l-xl focus:ring-teal-400 focus:border-teal-400 bg-navy-800 text-white placeholder-gray-400 transition-all duration-300 min-w-0"
+              aria-label="Add color hex code"
             />
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, boxShadow: '0 8px 20px rgba(45, 212, 191, 0.3)' }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              className="flex-shrink-0 px-4 py-2 rounded-r-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors duration-300 shadow-lg"
+              className="flex-shrink-0 px-4 sm:px-6 py-2 sm:py-3 rounded-r-xl bg-teal-500 text-navy-900 font-semibold hover:bg-teal-400 transition-all duration-300 shadow-lg"
+              aria-label="Add color to palette"
             >
               <FaPlus /> Add Color
             </motion.button>
           </form>
 
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.05, boxShadow: '0 8px 20px rgba(45, 212, 191, 0.3)' }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSavePalette}
-            className="flex items-center px-6 py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors duration-300 shadow-lg w-full sm:w-auto justify-center"
+            className="flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-teal-500 text-navy-900 font-semibold hover:bg-teal-400 transition-all duration-300 shadow-lg w-full sm:w-auto"
           >
             <FaSave className="mr-2" /> Save Palette
           </motion.button>
@@ -139,23 +145,23 @@ const HomePage = () => {
 
       {/* Saved Palettes Section */}
       {currentUser && (
-        <section className="mt-12 w-full max-w-6xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+        <section className="mt-8 sm:mt-12 w-full max-w-7xl mx-auto bg-navy-800/50 p-4 sm:p-6 rounded-xl shadow-xl border border-teal-600/50 backdrop-blur-sm">
+          <h2 className="text-2xl sm:text-3xl font-bold text-teal-400 mb-4 sm:mb-6 text-center tracking-tight">
             Your Saved Palettes
           </h2>
           {savedPalettes.length > 0 ? (
             <motion.div
               layout
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
             >
               <AnimatePresence>
                 {savedPalettes.map((palette) => (
-                  <PaletteCard key={palette.id} palette={palette} onDelete={deleteSavedPalette} />
+                  <PaletteCard key={palette.id} palette={palette} onDelete={() => deleteSavedPalette(palette.id)} />
                 ))}
               </AnimatePresence>
             </motion.div>
           ) : (
-            <p className="text-center text-gray-600 dark:text-gray-400 text-lg flex items-center justify-center">
+            <p className="text-center text-gray-300 text-base sm:text-lg flex items-center justify-center">
               <FaInfoCircle className="mr-2 text-xl" /> You haven't saved any palettes yet. Start generating and saving!
             </p>
           )}
@@ -164,19 +170,11 @@ const HomePage = () => {
 
       {/* Not Logged In Message */}
       {!currentUser && (
-        <p className="text-center text-gray-600 dark:text-gray-400 mt-12 text-lg flex items-center justify-center">
+        <p className="text-center text-gray-300 mt-8 sm:mt-12 text-base sm:text-lg flex items-center justify-center">
           <FaInfoCircle className="mr-2 text-xl" /> Log in to save and manage your color palettes!
         </p>
       )}
-       <footer className="fixed bottom-0 w-full bg-white dark:bg-gray-900 p-4 text-gray-900 dark:text-white">
-        <p className="text-center">
-          &copy; 2023 Color Palette Generator. All rights reserved.
-
-        </p>
-    
-       </footer>
     </motion.div>
-   
   );
 };
 
