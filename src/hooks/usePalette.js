@@ -1,10 +1,7 @@
 // hooks/usePalette.js
 import { useState, useEffect } from 'react';
 import { getFromLocalStorage, saveToLocalStorage } from '../utils/localStorageUtils';
-import { generateRandomHexColor } from '../utils/colorUtils.JS';
-import { hexToRgb } from '../utils/colorUtils.JS';
-import { rgbToHsl } from '../utils/colorUtils.JS';
-// import { generateRandomHexColor, hexToRgb, rgbToHsl } from "../utils/colorUtils"
+import { generateRandomHexColor, hexToRgb, rgbToHsl } from '../utils/colorUtils.js';
 
 const usePalette = (currentUser) => {
   const [currentPalette, setCurrentPalette] = useState([]);
@@ -42,12 +39,13 @@ const usePalette = (currentUser) => {
   };
 
   const saveCurrentPalette = () => {
+    // Replaced alert with console.error and a return value for better behavior in a modern app
     if (!currentUser) {
-      alert("Please log in to save palettes!");
+      console.error("Please log in to save palettes!");
       return false;
     }
     if (currentPalette.length === 0) {
-      alert("Cannot save an empty palette!");
+      console.error("Cannot save an empty palette!");
       return false;
     }
     const paletteToSave = {
